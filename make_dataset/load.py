@@ -39,14 +39,14 @@ def resize_img(resize_dim,img):
 	return resized_img
 
 def get_data(file_list,label_y_dict):
-	x = np.zeros((len(file_list),224,224))
+	x = np.zeros((len(file_list),112,112))
 	y = np.zeros((len(file_list),1))
 	for i in range(len(file_list)):
 		file = file_list[i]
 		img = read_image(file)
 #               print (img)
 		grey_image = img
-		resized_image = resize_img(224,grey_image)
+		resized_image = resize_img(112,grey_image)
                 resized_image.mode = "L"
 		x[i] = resized_image
 		y_k = os.path.basename(file).split('_')[0]
