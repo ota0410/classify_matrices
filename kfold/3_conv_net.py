@@ -114,7 +114,7 @@ keep_prob = tf.placeholder(tf.float32)
 # create model
 pred = alex_net(x, weights, biases, keep_prob)
 
-# define lost_func & optimizer
+# define loss_func & optimizer
 cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=pred, labels=y))
 optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
