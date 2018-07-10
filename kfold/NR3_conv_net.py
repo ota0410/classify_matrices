@@ -18,8 +18,8 @@ args = sys.argv
 # hyper parameters
 np.random.seed(1337)  # for reproducibility
 learning_rate = 0.001
-batch_size = 64
-training_epochs = 60
+batch_size = 32
+training_epochs = 40
 display_step = 1
 num_channel = 1
 
@@ -28,8 +28,8 @@ n_classes = 2
 dropout = 0.75
 n_input = config.img_row * config.img_col
 
-data_x = np.array(h5py.File("/home/s1411506/ota/kfold/sym112112.h5",'r').get('data_x'))
-label_y = np.array(h5py.File("/home/s1411506/ota/kfold/sym112112.h5",'r').get('label_y'))
+data_x = np.array(h5py.File("/home/s1411506/ota/kfold/CGNR.h5",'r').get('data_x'))
+label_y = np.array(h5py.File("/home/s1411506/ota/kfold/CGNR.h5",'r').get('label_y'))
 
 # define convolution
 def conv2d(name, x, W, b, strides = 1):
@@ -45,8 +45,8 @@ def maxpool2d(name, x, k=2):
     return tf.nn.max_pool(x, ksize = [1, k, k, 1], strides=[1, k, k, 1], padding='SAME', name=name)
 
 # define normlize
-def norm(name, l_input, lsize=4):
-    return tf.nn.lrn(l_input, lsize, bias=1.0, alpha=0.001 / 9.0, beta=0.75, name=name)
+#def norm(name, l_input, lsize=4):
+#    return tf.nn.lrn(l_input, lsize, bias=1.0, alpha=0.001 / 9.0, beta=0.75, name=name)
 
 # network parameters
 weights = {
@@ -114,7 +114,7 @@ keep_prob = tf.placeholder(tf.float32)
 # create model
 pred = alex_net(x, weights, biases, keep_prob)
 
-# define loss_func & optimizer
+# define lost_func & optimizer
 cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=pred, labels=y))
 optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
@@ -180,6 +180,8 @@ else:
         test = test_batch.DataSet(X_test, y_test)
         
         #sess = tf.Session()
+        acc_train_v = []
+        acc_test_v = []
         sess.run(init)
         print ("GRAPH READY")
         for epoch in range(training_epochs):
@@ -216,7 +218,7 @@ else:
                 for k in range(total_batch_2):
                     batch_xt, batch_yt = test.next_batch(batch_size)
                     val_accuracy, y_pred = sess.run([accuracy, y_p], feed_dict={x: batch_xt, y: batch_yt, keep_prob:1.})
-                    #test_acc = sess.run(accuracy, feed_dict={x: batch_xt, y: batch_yt, keep_prob:1.})
+                    test_acc = sess.run(accuracy, feed_dict={x: batch_xt, y: batch_yt, keep_prob:1.})
                     y_true = np.argmax(batch_yt, 1)
                     avg_y_true += y_true
                     avg_y_pred += y_pred
@@ -225,25 +227,35 @@ else:
                 avg_y_true = avg_y_true / total_batch_2
                 avg_y_pred = avg_y_pred / total_batch_2
                 print (" Test accuracy: %.4f" % (avg_test))
-
+                acc_train_v.append(train_acc)
+                acc_test_v.append(test_acc)
                 """
                 print (" Precision: %.4f" % (sklearn.metrics.precision_score(avg_y_true, avg_y_pred)))
                 print (" Recall: %.4f" % (sklearn.metrics.recall_score(avg_y_true, avg_y_pred)))
                 print (" f1_score: %.4f" % (sklearn.metrics.f1_score(avg_y_true, avg_y_pred)))
                 """
-                percentage.append(avg_test)
+                #percentage.append(avg_test)
         count += 1
 
-        # plot the graph
         """
+        # plot the graph of loss
         plt.plot(range(0,training_epochs),loss1,'r',label='Training')
         plt.plot(range(0,training_epochs),loss2,'b',label='Test')
         plt.legend(loc='upper right',prop={'size':11})
         plt.xlabel('Epochs')
         plt.ylabel('Loss')
         plt.show()
+
+        #plot the graph of accuracy
+        plt.plot(range(0,training_epochs),acc_train_v,'r',label='Training')
+        plt.plot(range(0,training_epochs),acc_test_v,'b',label='Test')
+        plt.legend(loc='upper right',prop={'size':11})
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.show()
         """
-        saver.save(sess, "model.ckpt")
+        
+        saver.save(sess, "./NRmodel.ckpt")
         print ("OPTIMIZATION FINISHED")
         break
     #val_accuracy, y_pred = sess.run([accuracy, y_p], feed_dict={x:})

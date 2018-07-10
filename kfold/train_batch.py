@@ -11,7 +11,7 @@ class DataSet(object):
     self._labels = labels
     self._epochs_completed = 0
     self._index_in_epoch = 0
-    self._num_examples = 991
+    self._num_examples = 423
 #4057542962
   @property
   def images(self):
