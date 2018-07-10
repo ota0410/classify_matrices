@@ -28,8 +28,8 @@ n_classes = 2
 dropout = 0.75
 n_input = config.img_row * config.img_col
 
-data_x = np.array(h5py.File("/home/s1411506/ota/kfold/sym112112.h5",'r').get('data_x'))
-label_y = np.array(h5py.File("/home/s1411506/ota/kfold/sym112112.h5",'r').get('label_y'))
+data_x = np.array(h5py.File("/home/s1411506/ota/kfold/CGNE.h5",'r').get('data_x'))
+label_y = np.array(h5py.File("/home/s1411506/ota/kfold/CGNE.h5",'r').get('label_y'))
 
 # define convolution
 def conv2d(name, x, W, b, strides = 1):
@@ -255,7 +255,7 @@ else:
         plt.show()
         """
 
-        saver.save(sess, "NEmodel.ckpt")
+        saver.save(sess, "./NEmodel.ckpt")
         print ("OPTIMIZATION FINISHED")
         break
     #val_accuracy, y_pred = sess.run([accuracy, y_p], feed_dict={x:})
